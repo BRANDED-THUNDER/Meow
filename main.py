@@ -1,25 +1,58 @@
 import asyncio
+
 from pytgcalls import idle
-from config import call_py, bot
+
+from config import bot, call_py
 
 
 async def main():
     print("STARTING Pyrogram CLIENT")
-    await bot.start()
-    print("STARTING PYTGCALLS CLIENT")
-    await call_py.start()
-    print(
-        """
-    ------------------------
-   | Meow userbot +  Music Actived! |
-    ------------------------
+
+    try:
+        await bot.start()
+    except Exception as e:
+        print(f"FAILED TO START PYROGRAM CLIENT: {e}")
+        print(
+            "Please check API_ID, API_HASH and SESSION in Heroku Config Vars."
+        )
+        return
+
+    print("PYROGRAM CLIENT STARTED")
+
+    try:
+        print("STARTING PYTGCALLS CLIENT")
+        await call_py.start()
+        print("PYTGCALLS CLIENT STARTED")
+
+        print(
+            """
+-------------------------------
+ Meow Userbot + Music Activated!
+-------------------------------
 """
-    )
-    await idle()
-    await pidle()
-    print("STOPPING USERBOT")
-    await bot.stop()
+        )
+
+        await idle()
+
+    except KeyboardInterrupt:
+        print("STOPPING USERBOT")
+
+    except Exception as e:
+        print(f"RUNTIME ERROR: {e}")
+
+    finally:
+        print("STOPPING USERBOT")
+
+        try:
+            await call_py.stop()
+        except Exception as e:
+            print(f"PYTGCALLS STOP ERROR: {e}")
+
+        try:
+            await bot.stop()
+        except Exception as e:
+            print(f"PYROGRAM STOP ERROR: {e}")
 
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
+if __name__ == "__main__":
+    asyncio.run(main())
