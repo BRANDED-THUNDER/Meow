@@ -5,21 +5,17 @@ import binascii
 
 from dotenv import load_dotenv
 from pyrogram import Client, filters
+from pyrogram.storage import MemoryStorage
 from pytgcalls import PyTgCalls
 
 
 __version__ = "v0.1"
 
-
-# ============================================================
-# LOAD ENVIRONMENT
-# ============================================================
-
 load_dotenv()
 
 
 # ============================================================
-# ENVIRONMENT VARIABLES
+# ENV
 # ============================================================
 
 API_ID_RAW = os.getenv("API_ID", "").strip()
@@ -31,7 +27,6 @@ HNDLR = os.getenv("HNDLR", ".").strip()
 ALIVE_PIC = os.getenv("ALIVE_PIC", "").strip()
 ALIVE_MSG = os.getenv("AlIVE_MSG", "").strip()
 PING_MSG = os.getenv("PING_MSG", "").strip()
-
 LOGS_CHANNEL = os.getenv("LOGS_CHANNEL", "").strip()
 
 
@@ -42,7 +37,50 @@ LOGS_CHANNEL = os.getenv("LOGS_CHANNEL", "").strip()
 try:
     API_ID = int(API_ID_RAW)
 except (TypeError, ValueError):
-    API_ID = 0
+    raise ValueError("API_ID is invalid.")
+
+
+if API_ID <= 0:
+    raise ValueError("API_ID is missing or invalid.")
+
+
+# ============================================================
+# API HASH
+# ============================================================
+
+if not API_HASH:
+    raise ValueError("API_HASH is missing.")
+
+
+# ============================================================
+# SESSION
+# ============================================================
+
+if not SESSION:
+    raise ValueError("SESSION is missing.")
+
+
+# ============================================================
+# SESSION DEBUG
+# ============================================================
+
+print("========================================")
+print("PYROGRAM SESSION CHECK")
+print("========================================")
+
+print(f"SESSION characters: {len(SESSION)}")
+
+try:
+    padded = SESSION + ("=" * (-len(SESSION) % 4))
+
+    decoded = base64.urlsafe_b64decode(padded)
+
+    print(f"SESSION decoded bytes: {len(decoded)}")
+
+except (binascii.Error, ValueError, TypeError) as e:
+    print(f"SESSION decode error: {e}")
+
+print("========================================")
 
 
 # ============================================================
@@ -62,75 +100,6 @@ if sudo_raw:
 
 
 # ============================================================
-# VALIDATION
-# ============================================================
-
-if API_ID <= 0:
-    raise ValueError(
-        "API_ID is missing or invalid. "
-        "Please set a valid numeric API_ID."
-    )
-
-
-if not API_HASH:
-    raise ValueError(
-        "API_HASH is missing. "
-        "Please set API_HASH in Heroku Config Vars."
-    )
-
-
-if not SESSION:
-    raise ValueError(
-        "SESSION is missing. "
-        "Please set SESSION in Heroku Config Vars."
-    )
-
-
-# ============================================================
-# SESSION DIAGNOSTICS
-# ============================================================
-#
-# IMPORTANT:
-# We NEVER print the actual SESSION.
-#
-# This helps identify:
-# - incomplete SESSION
-# - corrupted SESSION
-# - wrong base64 format
-# - wrong decoded size
-#
-# ============================================================
-
-print("========================================")
-print("PYROGRAM SESSION CHECK")
-print("========================================")
-
-print(
-    f"SESSION characters: {len(SESSION)}"
-)
-
-try:
-    padded_session = SESSION + (
-        "=" * (-len(SESSION) % 4)
-    )
-
-    decoded_session = base64.urlsafe_b64decode(
-        padded_session
-    )
-
-    print(
-        f"SESSION decoded bytes: {len(decoded_session)}"
-    )
-
-except (binascii.Error, ValueError, TypeError) as e:
-    print(
-        f"SESSION base64 decode failed: {e}"
-    )
-
-print("========================================")
-
-
-# ============================================================
 # CONTACT FILTER
 # ============================================================
 
@@ -145,28 +114,28 @@ contact_filter = filters.create(
 
 
 # ============================================================
-# PYROGRAM CLIENT
-# ============================================================
-#
-# Compatible with the existing Pyrogram 1.4.16 setup.
-#
-# IMPORTANT:
-# Do NOT use:
-#
-#     session_string=SESSION
-#
-# SESSION is passed as the first positional argument.
-#
+# PYROGRAM
 # ============================================================
 
 print("Initializing Pyrogram CLIENT...")
 
-bot = Client(
-    SESSION,
-    API_ID,
-    API_HASH,
-    plugins=dict(root="Modules"),
-)
+try:
+    storage = MemoryStorage(
+        "meow_userbot",
+        SESSION
+    )
+
+    bot = Client(
+        "meow_userbot",
+        api_id=API_ID,
+        api_hash=API_HASH,
+        storage=storage,
+        plugins=dict(root="Modules"),
+    )
+
+except Exception as e:
+    print(f"PYROGRAM CLIENT CONFIG ERROR: {e}")
+    raise
 
 
 # ============================================================
@@ -177,14 +146,11 @@ call_py = PyTgCalls(bot)
 
 
 # ============================================================
-# OTHER GLOBALS
+# GLOBALS
 # ============================================================
 
 hl = HNDLR[0] if HNDLR else "."
 
 start_time = time.time()
 
-
 print("Pyrogram CLIENT configuration loaded.")
-
-
