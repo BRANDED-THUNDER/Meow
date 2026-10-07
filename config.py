@@ -10,104 +10,106 @@ __version__ = "v0.1"
 
 
 # =========================
-# Load .env for local deploy
+# LOAD ENV
 # =========================
 
-if os.path.exists(".env"):
-    load_dotenv(".env")
+load_dotenv()
 
 
 # =========================
-# Environment Variables
+# ENV VARIABLES
 # =========================
 
-API_ID_RAW = os.getenv("API_ID")
-API_HASH = os.getenv("API_HASH")
-SESSION = os.getenv("SESSION")
+try:
+    API_ID = int(os.getenv("API_ID", "0"))
+except ValueError:
+    API_ID = 0
+
+API_HASH = os.getenv("API_HASH", "").strip()
+SESSION = os.getenv("SESSION", "").strip()
 
 HNDLR = os.getenv("HNDLR", ".")
-SUDO_USERS_RAW = os.getenv("SUDO_USERS", "")
-
 ALIVE_PIC = os.getenv("ALIVE_PIC", "")
-ALIVE_MSG = os.getenv("ALIVE_MSG", "")
+ALIVE_MSG = os.getenv("AlIVE_MSG", "")
 PING_MSG = os.getenv("PING_MSG", "")
-LOGS_CHANNEL = os.getenv("LOGS_CHANNEL")
+LOGS_CHANNEL = os.getenv("LOGS_CHANNEL", None)
 
 
 # =========================
-# Validate Variables
+# SUDO USERS
 # =========================
 
-if not API_ID_RAW:
-    raise RuntimeError("API_ID is missing.")
+SUDO_USERS = []
+
+sudo_raw = os.getenv("SUDO_USERS", "").strip()
+
+if sudo_raw:
+    for user_id in sudo_raw.replace(",", " ").split():
+        try:
+            SUDO_USERS.append(int(user_id))
+        except ValueError:
+            pass
+
+
+# =========================
+# VALIDATION
+# =========================
+
+if API_ID == 0:
+    raise ValueError("API_ID is missing or invalid.")
 
 if not API_HASH:
-    raise RuntimeError("API_HASH is missing.")
+    raise ValueError("API_HASH is missing.")
 
 if not SESSION:
-    raise RuntimeError("SESSION is missing.")
-
-if not SUDO_USERS_RAW:
-    raise RuntimeError("SUDO_USERS is missing.")
-
-
-try:
-    API_ID = int(API_ID_RAW)
-except ValueError:
-    raise RuntimeError("API_ID must be a valid integer.")
-
-
-try:
-    SUDO_USERS = [
-        int(user_id)
-        for user_id in SUDO_USERS_RAW.split()
-        if user_id.strip()
-    ]
-except ValueError:
-    raise RuntimeError(
-        "SUDO_USERS must contain only numeric Telegram user IDs."
-    )
+    raise ValueError("SESSION is missing.")
 
 
 # =========================
-# Contact Filter
+# CONTACT FILTER
 # =========================
 
 contact_filter = filters.create(
-    lambda _, __, message: (
-        message.from_user
-        and message.from_user.is_contact
-    )
-    or message.outgoing
+    lambda _, __, message:
+        (
+            message.from_user
+            and message.from_user.is_contact
+        )
+        or message.outgoing
 )
 
 
 # =========================
-# Pyrogram Client
+# PYROGRAM CLIENT
 # =========================
+#
+# IMPORTANT:
+# Pyrogram 1.4.16 does NOT accept
+# session_string= as a keyword.
+#
+# SESSION must be the first positional
+# argument.
+#
 
 print("Initializing Pyrogram CLIENT...")
 
 bot = Client(
-    "meow_userbot",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    session_string=SESSION,
+    SESSION,
+    API_ID,
+    API_HASH,
     plugins=dict(root="Modules"),
 )
 
-print("Pyrogram CLIENT initialized.")
-
 
 # =========================
-# PyTgCalls
+# PYTGCALLS
 # =========================
 
 call_py = PyTgCalls(bot)
 
 
 # =========================
-# Other Settings
+# OTHER GLOBALS
 # =========================
 
 hl = HNDLR[0] if HNDLR else "."
