@@ -5,7 +5,6 @@ import binascii
 
 from dotenv import load_dotenv
 from pyrogram import Client, filters
-from pyrogram.storage import MemoryStorage
 from pytgcalls import PyTgCalls
 
 
@@ -72,7 +71,6 @@ print(f"SESSION characters: {len(SESSION)}")
 
 try:
     padded = SESSION + ("=" * (-len(SESSION) % 4))
-
     decoded = base64.urlsafe_b64decode(padded)
 
     print(f"SESSION decoded bytes: {len(decoded)}")
@@ -120,16 +118,10 @@ contact_filter = filters.create(
 print("Initializing Pyrogram CLIENT...")
 
 try:
-    storage = MemoryStorage(
-        "meow_userbot",
-        SESSION
-    )
-
     bot = Client(
-        "meow_userbot",
-        api_id=API_ID,
-        api_hash=API_HASH,
-        storage=storage,
+        SESSION,
+        API_ID,
+        API_HASH,
         plugins=dict(root="Modules"),
     )
 
