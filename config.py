@@ -1,3 +1,4 @@
+```python
 import os
 import time
 
@@ -9,7 +10,10 @@ from pytgcalls import PyTgCalls
 __version__ = "v0.1"
 
 
-# Load .env for local deployment
+# =========================
+# Load .env for local deploy
+# =========================
+
 if os.path.exists(".env"):
     load_dotenv(".env")
 
@@ -32,20 +36,20 @@ LOGS_CHANNEL = os.getenv("LOGS_CHANNEL")
 
 
 # =========================
-# Validate Required Variables
+# Validate Variables
 # =========================
 
 if not API_ID_RAW:
-    raise RuntimeError("API_ID is missing from environment variables.")
+    raise RuntimeError("API_ID is missing.")
 
 if not API_HASH:
-    raise RuntimeError("API_HASH is missing from environment variables.")
+    raise RuntimeError("API_HASH is missing.")
 
 if not SESSION:
-    raise RuntimeError("SESSION is missing from environment variables.")
+    raise RuntimeError("SESSION is missing.")
 
 if not SUDO_USERS_RAW:
-    raise RuntimeError("SUDO_USERS is missing from environment variables.")
+    raise RuntimeError("SUDO_USERS is missing.")
 
 
 try:
@@ -86,10 +90,9 @@ contact_filter = filters.create(
 print("Initializing Pyrogram CLIENT...")
 
 bot = Client(
-    name="meow_userbot",
-    api_id=API_ID,
-    api_hash=API_HASH,
-    session_string=SESSION,
+    SESSION,
+    API_ID,
+    API_HASH,
     plugins=dict(root="Modules"),
 )
 
@@ -110,3 +113,4 @@ call_py = PyTgCalls(bot)
 hl = HNDLR[0] if HNDLR else "."
 
 start_time = time.time()
+```
