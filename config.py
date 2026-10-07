@@ -119,11 +119,11 @@ print("Initializing Pyrogram CLIENT...")
 
 try:
     bot = Client(
-        SESSION,
-        API_ID,
-        API_HASH,
-        plugins=dict(root="Modules"),
-    )
+    SESSION,
+    API_ID,
+    API_HASH,
+    plugins=dict(root="Modules"),
+)
 
 except Exception as e:
     print(f"PYROGRAM CLIENT CONFIG ERROR: {e}")
