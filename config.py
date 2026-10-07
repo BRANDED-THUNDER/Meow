@@ -188,38 +188,3 @@ start_time = time.time()
 print("Pyrogram CLIENT configuration loaded.")
 
 
-### Ab deploy ke baad log mein ye aayega:
-
-```text
-========================================
-PYROGRAM SESSION CHECK
-========================================
-SESSION characters: XXXXX
-SESSION decoded bytes: XXXXX
-========================================
-Initializing Pyrogram CLIENT...
-
-**Actual session string kahin print nahi hogi.**
-
-Agar phir:
-
-```text
-unpack requires a buffer of 267 bytes
-```
-
-aata hai, to mujhe sirf ye 2 values bhejna:
-
-```text
-SESSION characters: ?
-SESSION decoded bytes: ?
-```
-
-`SESSION` khud **bilkul mat bhejna**.
-
-Ek aur important cheez: `requirements.txt` mein abhi bhi exactly:
-
-```text
-pyrogram==1.4.16
-```
-
-hona chahiye. `2.0.x` ya `2.2.26` mix mat karna.
