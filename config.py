@@ -99,7 +99,6 @@ bot = Client(
     API_HASH,
     plugins=dict(root="Modules"),
 )
-
 # =========================
 # PYTGCALLS
 # =========================
