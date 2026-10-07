@@ -1,12 +1,10 @@
-python-3.10.6
 TgCrypto
-pyrogram==1.4.16 
+pyrogram==1.4.16
 py-tgcalls==0.8.5
 requests
 aiohttp
 aiofiles
 pillow
-asyncio
 wget
 python-arq
 youtube-search-python==1.4.6
