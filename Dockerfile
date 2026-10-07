@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye
+FROM python:3.10-slim-bookworm
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -6,23 +6,22 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# System dependencies
+# Install FFmpeg and required system packages
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         ffmpeg \
         git \
         curl \
-        nodejs \
-        npm \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy project
+# Copy project files
 COPY . /app
 
-# Upgrade pip
+# Upgrade pip tools
 RUN python -m pip install --upgrade pip setuptools wheel
 
-# Install dependencies
+# Install project dependencies
 RUN pip install --no-cache-dir -r UB.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
