@@ -1,4 +1,3 @@
-```python
 import os
 import time
 
@@ -113,4 +112,3 @@ call_py = PyTgCalls(bot)
 hl = HNDLR[0] if HNDLR else "."
 
 start_time = time.time()
-```
