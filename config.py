@@ -100,7 +100,6 @@ bot = Client(
     plugins=dict(root="Modules"),
 )
 
-
 # =========================
 # PYTGCALLS
 # =========================
