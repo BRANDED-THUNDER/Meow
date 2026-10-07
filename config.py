@@ -89,9 +89,10 @@ contact_filter = filters.create(
 print("Initializing Pyrogram CLIENT...")
 
 bot = Client(
-    SESSION,
-    API_ID,
-    API_HASH,
+    "meow_userbot",
+    api_id=API_ID,
+    api_hash=API_HASH,
+    session_string=SESSION,
     plugins=dict(root="Modules"),
 )
 
